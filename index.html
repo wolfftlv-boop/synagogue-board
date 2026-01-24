@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לוח תצוגה דיגיטלי - Portrait</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDe31VHniTkz_grYpA2e_RXx4g5Cnxa1ng",
+          authDomain: "synagogue-board-tlv.firebaseapp.com",
+          projectId: "synagogue-board-tlv",
+          storageBucket: "synagogue-board-tlv.firebasestorage.app",
+          messagingSenderId: "794671855844",
+          appId: "1:794671855844:web:3e44c92b15f833784c14f1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+    </script>
+</head>
+<body class="portrait-layout">
+    <header class="top-header">
+        <div class="header-logo">
+            <img id="shul-logo" src="https://via.placeholder.com/150x150?text=LOGO" alt="לוגו">
+        </div>
+        <div class="header-info">
+            <h1 id="shul-name-display">שם המוסד</h1>
+            <div class="date-card">
+                <div id="heb-date">--</div>
+                <div id="parasha">--</div>
+            </div>
+        </div>
+        <div id="digital-clock">00:00:00</div>
+    </header>
+
+    <main class="slides-container">
+        <!-- שקופית 1: זמני היום -->
+        <div class="slide active" id="slide-0">
+            <h2 class="slide-label">זמני היום - תל אביב</h2>
+            <div id="zmanim-list" class="grid-view"></div>
+        </div>
+        <!-- שקופית 2: תפילות -->
+        <div class="slide" id="slide-1">
+            <h2 class="slide-label">זמני תפילות</h2>
+            <div id="prayers-list" class="list-view"></div>
+        </div>
+        <!-- שקופית 3: הודעות -->
+        <div class="slide" id="slide-2">
+            <h2 class="slide-label">הודעות והכרזות</h2>
+            <div id="announcement-area" class="text-view"></div>
+        </div>
+        <!-- שקופית 4: הקדשות -->
+        <div class="slide" id="slide-3">
+            <h2 class="slide-label">הקדשות לימוד</h2>
+            <div id="dedications-list" class="list-view"></div>
+        </div>
+        <!-- שקופית 5: הלימוד מוקדש -->
+        <div class="slide" id="slide-4">
+            <h2 class="slide-label">הלימוד מוקדש ל...</h2>
+            <div id="study-dedication-area" class="text-view highlight"></div>
+        </div>
+    </main>
+
+    <footer class="bottom-ticker">
+        <div class="ticker-content" id="ticker-text">ברוכים הבאים למערכת התצוגה הדיגיטלית</div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

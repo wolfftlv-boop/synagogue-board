@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>לוח בקרה - ניהול תצוגה</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root { --amber: #d97706; --slate: #1e293b; }
+        body { font-family: sans-serif; background: #f1f5f9; direction: rtl; padding: 10px; }
+        .tabs { display: flex; overflow-x: auto; background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; }
+        .tab { padding: 10px 15px; white-space: nowrap; cursor: pointer; border-radius: 5px; }
+        .tab.active { background: var(--amber); color: white; }
+        .panel { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .panel.active { display: block; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--slate); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .item-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .del-btn { background: #ef4444; width: auto; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div id="login-form" style="max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 15px;">
+        <h2>כניסת מנהל</h2>
+        <input type="email" id="admin-email" placeholder="אימייל">
+        <input type="password" id="admin-pass" placeholder="סיסמה">
+        <button onclick="login()">התחברות</button>
+    </div>
+
+    <div id="admin-content" style="display:none;">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab(0)">הגדרות</div>
+            <div class="tab" onclick="showTab(1)">תפילות</div>
+            <div class="tab" onclick="showTab(2)">הודעות</div>
+            <div class="tab" onclick="showTab(3)">הקדשות</div>
+        </div>
+
+        <!-- פאנל הגדרות -->
+        <div id="p0" class="panel active">
+            <h3>הגדרות כלליות</h3>
+            <input type="text" id="set-shul-name" placeholder="שם המוסד">
+            <input type="text" id="set-ticker" placeholder="טקסט רץ בתחתית">
+            <input type="text" id="set-logo" placeholder="קישור ללוגו (URL)">
+            <h4>זמן לכל שקופית (בשניות)</h4>
+            <input type="number" id="t0" placeholder="זמני היום">
+            <input type="number" id="t1" placeholder="תפילות">
+            <input type="number" id="t2" placeholder="הודעות">
+            <input type="number" id="t3" placeholder="הקדשות">
+            <input type="number" id="t4" placeholder="הלימוד מוקדש">
+            <button onclick="saveSettings()">שמור הכל</button>
+        </div>
+
+        <!-- פאנל תפילות -->
+        <div id="p1" class="panel">
+            <h3>הוספת תפילה</h3>
+            <input type="text" id="pr-name" placeholder="שם התפילה (למשל: מנחה א')">
+            <input type="text" id="pr-time" placeholder="שעה (למשל: 13:30)">
+            <button onclick="addItem('prayers', {name: $('#pr-name').value, time: $('#pr-time').value})">הוסף</button>
+            <div id="list-prayers"></div>
+        </div>
+        <!-- ... שאר הפאנלים דומים ... -->
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, addDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDe31VHniTkz_grYpA2e_RXx4g5Cnxa1ng",
+          authDomain: "synagogue-board-tlv.firebaseapp.com",
+          projectId: "synagogue-board-tlv",
+          storageBucket: "synagogue-board-tlv.firebasestorage.app",
+          messagingSenderId: "794671855844",
+          appId: "1:794671855844:web:3e44c92b15f833784c14f1"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.$ = (id) => document.querySelector(id);
+        window.showTab = (i) => {
+            document.querySelectorAll('.tab, .panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab')[i].classList.add('active');
+            document.getElementById(`p${i}`).classList.add('active');
+        };
+
+        window.login = () => {
+            signInWithEmailAndPassword(auth, $('#admin-email').value, $('#admin-pass').value)
+                .then(() => { $('#login-form').style.display='none'; $('#admin-content').style.display='block'; })
+                .catch(() => alert("טעות בפרטים"));
+        };
+
+        window.saveSettings = async () => {
+            const data = {
+                shul_name: $('#set-shul-name').value,
+                ticker: $('#set-ticker').value,
+                logo: $('#set-logo').value,
+                times: [
+                    $('#t0').value*1000, $('#t1').value*1000, $('#t2').value*1000, $('#t3').value*1000, $('#t4').value*1000
+                ]
+            };
+            await setDoc(doc(db, "settings", "global"), data);
+            alert("נשמר!");
+        };
+
+        window.addItem = async (col, data) => {
+            await addDoc(collection(db, col), data);
+            alert("נוסף!");
+        };
+    </script>
+</body>
+</html>
