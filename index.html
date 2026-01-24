@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>לוח שידורים בית כנסת - Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDe31VHniTkz_grYpA2e_RXx4g5Cnxa1ng",
+          authDomain: "synagogue-board-tlv.firebaseapp.com",
+          projectId: "synagogue-board-tlv",
+          storageBucket: "synagogue-board-tlv.firebasestorage.app",
+          messagingSenderId: "794671855844",
+          appId: "1:794671855844:web:3e44c92b15f833784c14f1",
+          measurementId: "G-FRDYEWQMX6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.customMessages = [];
+        onSnapshot(query(collection(db, "messages"), orderBy("date", "desc")), (snapshot) => {
+            window.customMessages = snapshot.docs.map(doc => doc.data().text);
+        });
+    </script>
+</head>
+<body>
+    <div class="overlay-frame"></div>
+    
+    <header id="top-bar">
+        <div id="clock-container">
+            <span id="clock-time">00:00:00</span>
+        </div>
+        <div id="date-container">
+            <div id="heb-date">טוען תאריך...</div>
+            <div id="parasha-name">פרשת השבוע</div>
+        </div>
+    </header>
+
+    <main id="display-area">
+        <!-- שקופית 1: זמנים -->
+        <div class="slide active" id="slide-zmanim">
+            <h2 class="section-title">זמני היום - תל אביב</h2>
+            <div class="zmanim-grid">
+                <div class="zman-card"><span>נץ החמה</span><b id="sunrise">--:--</b></div>
+                <div class="zman-card"><span>סוף זמן ק"ש</span><b id="shema">--:--</b></div>
+                <div class="zman-card"><span>סוף זמן תפילה</span><b id="tefila">--:--</b></div>
+                <div class="zman-card"><span>חצות היום</span><b id="noon">--:--</b></div>
+                <div class="zman-card"><span>מנחה גדולה</span><b id="mincha">--:--</b></div>
+                <div class="zman-card"><span>שקיעה</span><b id="sunset">--:--</b></div>
+                <div class="zman-card"><span>צאת הכוכבים</span><b id="stars">--:--</b></div>
+            </div>
+        </div>
+
+        <!-- שקופית 2: שיעורים -->
+        <div class="slide" id="slide-lessons">
+            <h2 class="section-title">לימוד יומי 📜</h2>
+            <div class="lessons-grid">
+                <div class="lesson-box"><h3>חומש</h3><p id="lesson-chumash">...</p></div>
+                <div class="lesson-box"><h3>תהילים</h3><p id="lesson-tehillim">...</p></div>
+                <div class="lesson-box"><h3>תניא</h3><p id="lesson-tanya">...</p></div>
+                <div class="lesson-box"><h3>רמב"ם</h3><p id="lesson-rambam">...</p></div>
+            </div>
+        </div>
+
+        <!-- שקופית 3: הודעות -->
+        <div class="slide" id="slide-messages">
+            <h2 class="section-title">הודעות והכרזות 📢</h2>
+            <div id="message-text" class="announcement-text">ברוכים הבאים</div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
