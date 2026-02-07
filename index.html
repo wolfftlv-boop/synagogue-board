@@ -2,59 +2,164 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>תצוגה - חזון אליהו</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ניהול חזון אליהו</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .tab.active { background: #d97706; color: white; border-bottom: 4px solid #92400e; }
+    </style>
 </head>
-<body class="h-screen flex flex-col bg-slate-50 text-slate-900 overflow-hidden">
+<body class="bg-slate-100 min-h-screen">
+    
+    <!-- טופס התחברות -->
+    <div id="login-form" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl mt-20">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800">כניסת מנהל</h2>
+        <input type="email" id="email" placeholder="אימייל" class="w-full p-4 mb-4 border rounded-xl">
+        <input type="password" id="pass" placeholder="סיסמה" class="w-full p-4 mb-6 border rounded-xl">
+        <button id="login-btn" class="w-full bg-slate-800 text-white p-4 rounded-xl font-bold hover:bg-slate-700 transition">התחברות</button>
+    </div>
 
-    <header class="h-[18vh] bg-white border-b-8 border-amber-500 flex justify-between items-center px-12 shadow-xl z-20">
-        <div class="flex items-center">
-            <img id="shul-logo" src="logo.png" onerror="this.style.display='none'" class="h-28 w-auto ml-6">
-            <div>
-                <h1 id="display-shul-name" class="text-6xl font-bold text-slate-800">ישיבת חזון אליהו</h1>
-                <p class="text-3xl text-slate-500 italic">תל אביב - יפו</p>
-            </div>
-        </div>
-        <div class="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 text-center min-w-[450px]">
-            <div id="heb-date" class="text-5xl font-bold text-amber-800"></div>
-            <div id="parasha" class="text-4xl text-amber-600 font-bold"></div>
-        </div>
-        <div id="digital-clock" class="text-9xl font-bold tabular-nums">00:00</div>
-    </header>
+    <!-- תוכן הניהול -->
+    <div id="admin-content" class="hidden max-w-5xl mx-auto p-4">
+        <header class="bg-amber-600 p-6 rounded-t-2xl text-white flex justify-between items-center shadow-lg">
+            <h1 class="text-2xl font-bold">לוח בקרה - ישיבת חזון אליהו</h1>
+            <button onclick="location.reload()" class="text-sm bg-amber-800 px-4 py-2 rounded-lg">יציאה/ניתוק</button>
+        </header>
 
-    <main class="h-[74vh] p-12 relative">
-        <div id="slide-container" class="h-full">
-            <div class="slide active" id="s0">
-                <h2 class="text-7xl font-bold mb-12 text-center">זמני היום</h2>
-                <div id="zmanim-list" class="grid grid-cols-1 gap-4 max-w-4xl mx-auto"></div>
-            </div>
-            <div class="slide" id="s1">
-                <h2 class="text-7xl font-bold mb-12 text-center">לוח תפילות ושיעורים</h2>
-                <div id="prayers-list" class="space-y-4 max-w-4xl mx-auto"></div>
-            </div>
-            <div class="slide" id="s2">
-                <h2 class="text-7xl font-bold mb-12 text-center">שיעורי חת"ת ורמב"ם</h2>
-                <div id="study-area" class="max-w-5xl mx-auto space-y-6"></div>
-            </div>
-            <div class="slide" id="s3">
-                <h2 class="text-7xl font-bold mb-12 text-center text-red-600">לוח מודעות</h2>
-                <div id="msgs-area" class="bg-white rounded-[3rem] p-16 shadow-2xl h-full flex flex-col justify-center text-5xl leading-tight text-center border-4 border-red-50"></div>
-            </div>
-            <div class="slide" id="s4">
-                <h2 class="text-7xl font-bold mb-12 text-center">הלימוד היום מוקדש</h2>
-                <div id="deds-area" class="max-w-5xl mx-auto space-y-8"></div>
-            </div>
-        </div>
-    </main>
+        <nav class="flex bg-white border-b overflow-x-auto shadow-md">
+            <button onclick="tab(0)" class="tab active flex-1 p-5 font-bold border-l">⚙️ הגדרות</button>
+            <button onclick="tab(1)" class="tab flex-1 p-5 font-bold border-l">🕍 תפילות</button>
+            <button onclick="tab(2)" class="tab flex-1 p-5 font-bold border-l">📢 הודעות</button>
+            <button onclick="tab(3)" class="tab flex-1 p-5 font-bold">🕯️ הקדשות</button>
+        </nav>
 
-    <footer class="h-[8vh] bg-amber-600 flex items-center overflow-hidden">
-        <div id="ticker-text" class="ticker text-white text-5xl font-bold"></div>
-    </footer>
+        <main class="bg-white p-8 rounded-b-2xl shadow-2xl">
+            <!-- טאב הגדרות -->
+            <div id="p0" class="panel active">
+                <h3 class="text-xl font-bold mb-4 border-b pb-2">הגדרות תצוגה כלליות</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block font-bold mb-1">שם הישיבה:</label>
+                        <input type="text" id="set-name" class="w-full p-3 border rounded-lg bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">טקסט רץ בתחתית:</label>
+                        <textarea id="set-ticker" class="w-full p-3 border rounded-lg bg-gray-50 h-24"></textarea>
+                    </div>
+                    <button onclick="saveSettings()" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold w-full text-xl shadow-lg transition">שמור ועדכן את המסך ✅</button>
+                </div>
+            </div>
 
+            <!-- טאב תפילות -->
+            <div id="p1" class="panel">
+                <h3 class="text-xl font-bold mb-4 border-b pb-2">הוספת תפילה / שיעור</h3>
+                <div class="flex flex-wrap gap-3">
+                    <input type="text" id="pr-name" placeholder="שם (למשל: מנחה ב')" class="flex-1 min-w-[200px] p-3 border rounded-lg">
+                    <input type="text" id="pr-time" placeholder="שעה" class="w-32 p-3 border rounded-lg">
+                    <button onclick="add('prayers', {name:$('#pr-name').value, time:$('#pr-time').value})" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">+</button>
+                </div>
+                <div id="list-prayers" class="mt-8 space-y-2"></div>
+            </div>
+
+            <!-- טאב הודעות -->
+            <div id="p2" class="panel">
+                <h3 class="text-xl font-bold mb-4 border-b pb-2">הודעות ללוח מודעות</h3>
+                <div class="flex gap-3">
+                    <input type="text" id="msg-text" placeholder="תוכן ההודעה" class="flex-1 p-3 border rounded-lg">
+                    <button onclick="add('messages', {text:$('#msg-text').value})" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">הוסף הודעה</button>
+                </div>
+                <div id="list-messages" class="mt-8 space-y-2"></div>
+            </div>
+
+            <!-- טאב הקדשות -->
+            <div id="p3" class="panel">
+                <h3 class="text-xl font-bold mb-4 border-b pb-2">הקדשות ללימוד</h3>
+                <div class="flex gap-3">
+                    <input type="text" id="ded-text" placeholder="למשל: לזכות רפואת יצחק בן שרה" class="flex-1 p-3 border rounded-lg">
+                    <button onclick="add('dedications', {text:$('#ded-text').value})" class="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700">הוסף הקדשה</button>
+                </div>
+                <div id="list-dedications" class="mt-8 space-y-2"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ספריות Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script type="module" src="script.js"></script>
+    
+    <script>
+        // המפתחות שלך - מעודכן!
+        const firebaseConfig = {
+            apiKey: "AIzaSyDe31VHniTkz_grYpA2e_RXx4g5Cnxa1ng",
+            authDomain: "synagogue-board-tlv.firebaseapp.com",
+            projectId: "synagogue-board-tlv",
+            storageBucket: "synagogue-board-tlv.firebasestorage.app",
+            messagingSenderId: "794671855844",
+            appId: "1:794671855844:web:3e44c92b15f833784c14f1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const $ = id => document.querySelector(id);
+        
+        // התחברות
+        $('#login-btn').onclick = () => {
+            const email = $('#email').value;
+            const pass = $('#pass').value;
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => { 
+                    $('#login-form').classList.add('hidden'); 
+                    $('#admin-content').classList.remove('hidden'); 
+                })
+                .catch((error) => alert("שגיאה: " + error.message));
+        };
+
+        // ניהול טאבים
+        window.tab = (i) => {
+            document.querySelectorAll('.tab, .panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab')[i].classList.add('active');
+            $(`#p${i}`).classList.add('active');
+        };
+
+        // שמירת הגדרות
+        window.saveSettings = () => {
+            db.collection("settings").doc("global").set({
+                shul_name: $('#set-name').value,
+                ticker: $('#set-ticker').value
+            }).then(() => alert("עודכן בהצלחה!"));
+        };
+
+        // הוספת נתונים
+        window.add = (col, data) => {
+            if(!data.name && !data.text) return;
+            db.collection(col).add(data).then(() => {
+                // ניקוי שדות
+                if($('#pr-name')) $('#pr-name').value = '';
+                if($('#msg-text')) $('#msg-text').value = '';
+                if($('#ded-text')) $('#ded-text').value = '';
+            });
+        };
+
+        // סנכרון תצוגה בניהול (למחיקה)
+        const syncAdmin = (col) => {
+            db.collection(col).onSnapshot(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    html += `<div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl mb-2 border hover:bg-white transition shadow-sm">
+                        <span class="font-bold text-lg">${d.name || ''} ${d.time || ''} ${d.text || ''}</span>
+                        <button onclick="if(confirm('למחוק?')) firebase.firestore().collection('${col}').doc('${doc.id}').delete()" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded-lg">מחק 🗑️</button>
+                    </div>`;
+                });
+                $(`#list-${col}`).innerHTML = html;
+            });
+        };
+
+        ["prayers", "messages", "dedications"].forEach(syncAdmin);
+    </script>
 </body>
 </html>
