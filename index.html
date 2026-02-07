@@ -3,28 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ישיבת חזון אליהו - תצוגה דיגיטלית</title>
+    <title>ישיבת חזון אליהו - תצוגה</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700;800&family=Frank+Ruhl+Libre:wght@700;900&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; overflow: hidden; }
-        .font-holy { font-family: 'Frank Ruhl Libre', serif; }
-        .slide { display: none; height: 100%; width: 100%; opacity: 0; transform: scale(0.98); transition: all 0.8s ease-in-out; }
-        .slide.active { display: flex; flex-direction: column; opacity: 1; transform: scale(1); }
+        body { font-family: 'Assistant', sans-serif; background-color: #f8fafc; overflow: hidden; height: 100vh; }
+        .slide { display: none; height: 100%; opacity: 0; transition: all 0.8s ease-in-out; }
+        .slide.active { display: flex; flex-direction: column; opacity: 1; }
         .ticker-move { display: inline-block; white-space: nowrap; animation: ticker 40s linear infinite; }
         @keyframes ticker { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        .zman-row { background: white; border-radius: 1.5rem; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-right: 15px solid #d97706; }
+        .portrait-frame { height: 100vh; display: flex; flex-direction: column; }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col">
-
-    <!-- HEADER (18%) -->
+<body class="portrait-frame">
+    <!-- Header (18%) -->
     <header class="h-[18vh] bg-white border-b-[10px] border-amber-500 flex justify-between items-center px-12 shadow-2xl z-20">
         <div class="flex items-center gap-6">
-            <img src="logo.png" onerror="this.style.display='none'" class="h-28 w-auto">
-            <div>
-                <h1 id="shul-name-header" class="text-6xl font-black text-slate-800">ישיבת חזון אליהו</h1>
+            <div class="text-right">
+                <h1 id="shul-name-display" class="text-6xl font-black text-slate-800">ישיבת חזון אליהו</h1>
                 <p class="text-3xl text-slate-500 font-bold">תל אביב - יפו</p>
             </div>
         </div>
@@ -35,116 +31,37 @@
         <div id="clock" class="text-[9rem] font-black tabular-nums text-slate-900">00:00</div>
     </header>
 
-    <!-- MAIN (74%) -->
+    <!-- Main (74%) -->
     <main class="h-[74vh] relative p-12 overflow-hidden">
-        <!-- Slide 1: Zmanim -->
         <div class="slide active" id="s0">
-            <h2 class="text-7xl font-black text-center mb-10 text-slate-800">זמני היום - תל אביב 🏙️</h2>
+            <h2 class="text-7xl font-black text-center mb-10 text-slate-800 border-b-4 border-slate-100 pb-4">זמני היום - תל אביב</h2>
             <div id="zmanim-list" class="grid grid-cols-1 gap-4 max-w-5xl mx-auto w-full"></div>
         </div>
-        <!-- Slide 2: Prayers -->
         <div class="slide" id="s1">
             <h2 class="text-7xl font-black text-center mb-10 text-slate-800">זמני תפילות 🕍</h2>
             <div id="prayers-list" class="space-y-4 max-w-4xl mx-auto w-full"></div>
         </div>
-        <!-- Slide 3: Study (Hitat/Rambam) -->
         <div class="slide" id="s2">
-            <h2 class="text-7xl font-black text-center mb-10 text-slate-800">שיעורי היום 📜</h2>
-            <div id="study-list" class="space-y-6 max-w-5xl mx-auto w-full"></div>
+            <h2 class="text-7xl font-black text-center mb-10 text-slate-800">סדר היום - <span id="day-name"></span></h2>
+            <div id="schedule-list" class="space-y-4 max-w-5xl mx-auto w-full"></div>
         </div>
-        <!-- Slide 4: Announcements -->
         <div class="slide" id="s3">
             <h2 class="text-7xl font-black text-center mb-10 text-red-600">לוח מודעות 📢</h2>
-            <div id="messages-list" class="h-full flex flex-col justify-center items-center text-6xl font-bold text-center space-y-8 p-12 bg-white rounded-[3rem] shadow-xl border-4 border-red-50"></div>
+            <div id="messages-list" class="h-full flex flex-col justify-center items-center text-6xl font-bold text-center leading-tight"></div>
         </div>
-        <!-- Slide 5: Dedications -->
         <div class="slide" id="s4">
-            <h2 class="text-7xl font-black text-center mb-10 text-slate-800">הלימוד היום מוקדש 🕯️</h2>
+            <h2 class="text-7xl font-black text-center mb-10 text-slate-800">הקדשות לימוד 🕯️</h2>
             <div id="dedications-list" class="space-y-8 max-w-5xl mx-auto w-full"></div>
         </div>
     </main>
 
-    <!-- FOOTER (8%) -->
-    <footer class="h-[8vh] bg-amber-600 flex items-center overflow-hidden">
-        <div class="ticker-move text-white text-5xl font-black font-holy" id="ticker-text">ברוכים הבאים לישיבת חזון אליהו - תל אביב</div>
+    <!-- Footer (8%) -->
+    <footer class="h-[8vh] bg-amber-600 flex items-center overflow-hidden relative">
+        <div class="ticker-move text-white text-5xl font-black" id="ticker-display">ברוכים הבאים...</div>
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDe31VHniTkz_grYpA2e_RXx4g5Cnxa1ng",
-            authDomain: "synagogue-board-tlv.firebaseapp.com",
-            projectId: "synagogue-board-tlv",
-            storageBucket: "synagogue-board-tlv.firebasestorage.app",
-            messagingSenderId: "794671855844",
-            appId: "1:794671855844:web:3e44c92b15f833784c14f1"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // שעון
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('he-IL', {hour: '2-digit', minute: '2-digit', hour12: false});
-        }, 1000);
-
-        // Firebase Sync
-        db.collection("settings").doc("global").onSnapshot(doc => {
-            if(doc.exists) {
-                document.getElementById('shul-name-header').innerText = doc.data().shul_name || "חזון אליהו";
-                document.getElementById('ticker-text').innerText = doc.data().ticker + " • " + doc.data().ticker;
-            }
-        });
-
-        const syncCol = (col, id, template) => {
-            db.collection(col).onSnapshot(snap => {
-                let html = '';
-                snap.forEach(d => html += template(d.data()));
-                document.getElementById(id).innerHTML = html || '<div class="text-center text-slate-300">אין נתונים להצגה</div>';
-            });
-        };
-
-        syncCol("prayers", "prayers-list", d => `<div class="zman-row"><span class="text-5xl font-bold">${d.name}</span><span class="text-6xl font-black text-amber-600 tabular-nums">${d.time}</span></div>`);
-        syncCol("messages", "messages-list", d => `<div class="leading-tight">● ${d.text}</div>`);
-        syncCol("dedications", "dedications-list", d => `<div class="bg-amber-50 p-10 rounded-[3rem] border-2 border-amber-100 text-5xl font-black text-center text-amber-900 shadow-lg">${d.text}</div>`);
-
-        // APIs
-        async function fetchInfo() {
-            try {
-                const h = await (await fetch("https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&m=50")).json();
-                document.getElementById('heb-date').innerText = h.items.find(i => i.category === 'hebdate').memo;
-                document.getElementById('parasha').innerText = "פרשת " + h.items.find(i => i.category === 'parashat').hebrew;
-
-                const z = await (await fetch("https://www.hebcal.com/zmanim?cfg=json&geonameid=293397")).json();
-                const sel = { sunrise: 'נץ החמה', sof_zman_shma: 'סוף זמן ק"ש', sof_zman_tfila: 'סוף תפילה', sunset: 'שקיעה', tzeit: 'צאת הכוכבים' };
-                let zHtml = '';
-                for(let [k,v] of Object.entries(sel)) {
-                    const t = new Date(z.times[k]).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-                    zHtml += `<div class="zman-row"><span class="text-4xl font-bold text-slate-600">${v}</span><span class="text-6xl font-black text-slate-800">${t}</span></div>`;
-                }
-                document.getElementById('zmanim-list').innerHTML = zHtml;
-
-                // חת"ת ורמב"ם (RSS Proxy)
-                const s = await (await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent("https://he.chabad.org/tools/rss/daily_lesson.xml"))).json();
-                const items = new DOMParser().parseFromString(s.contents, "text/xml").querySelectorAll("item");
-                let sHtml = '';
-                items.forEach((item, i) => { if(i < 4) sHtml += `<div class="zman-row"><span class="text-4xl font-bold text-amber-800">${item.querySelector("title").textContent}</span></div>`; });
-                document.getElementById('study-list').innerHTML = sHtml;
-            } catch(e) {}
-        }
-
-        let cur = 0;
-        function rotate() {
-            const s = document.querySelectorAll('.slide');
-            s[cur].classList.remove('active');
-            cur = (cur + 1) % s.length;
-            s[cur].classList.add('active');
-        }
-
-        fetchInfo();
-        setInterval(rotate, 15000);
-        setInterval(fetchInfo, 3600000);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
