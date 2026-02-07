@@ -1,0 +1,38 @@
+body { font-family: 'Assistant', sans-serif; background: #f8fafc; }
+.slide { display: none; height: 100%; animation: fadeIn 0.8s ease-in-out; }
+.slide.active { display: flex; flex-direction: column; }
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+.ticker {
+    display: inline-block;
+    white-space: nowrap;
+    animation: ticker 35s linear infinite;
+}
+
+@keyframes ticker {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}
+
+.zman-card, .prayer-card {
+    background: white;
+    padding: 1.5rem 3rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: 15px solid #d97706;
+}
+
+.ded-card {
+    background: #fffcf0;
+    padding: 2.5rem;
+    border-radius: 2rem;
+    text-align: center;
+    font-size: 4rem;
+    font-weight: bold;
+    border: 2px solid #fde68a;
+    box-shadow: 0 10px 20px rgba(217, 119, 6, 0.1);
+}

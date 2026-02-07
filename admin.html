@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול חזון אליהו</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .tab.active { background: #d97706; color: white; border-bottom: 4px solid #92400e; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+    
+    <div id="login-form" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl mt-20">
+        <h2 class="text-3xl font-bold mb-6 text-center">כניסת מנהל</h2>
+        <input type="email" id="email" placeholder="אימייל" class="w-full p-4 mb-4 border rounded-xl">
+        <input type="password" id="pass" placeholder="סיסמה" class="w-full p-4 mb-6 border rounded-xl">
+        <button id="login-btn" class="w-full bg-slate-800 text-white p-4 rounded-xl font-bold">התחברות</button>
+    </div>
+
+    <div id="admin-content" class="hidden max-w-5xl mx-auto p-4">
+        <header class="bg-amber-600 p-6 rounded-t-2xl text-white flex justify-between items-center">
+            <h1 class="text-2xl font-bold">לוח בקרה - ישיבת חזון אליהו</h1>
+            <button onclick="location.reload()" class="text-sm bg-amber-800 px-3 py-1 rounded">יציאה</button>
+        </header>
+
+        <nav class="flex bg-white border-b overflow-x-auto">
+            <button onclick="tab(0)" class="tab active flex-1 p-5 font-bold">⚙️ הגדרות</button>
+            <button onclick="tab(1)" class="tab flex-1 p-5 font-bold">🕍 תפילות</button>
+            <button onclick="tab(2)" class="tab flex-1 p-5 font-bold">📢 הודעות</button>
+            <button onclick="tab(3)" class="tab flex-1 p-5 font-bold">🕯️ הקדשות</button>
+        </nav>
+
+        <main class="bg-white p-8 rounded-b-2xl shadow-lg">
+            <div id="p0" class="panel active">
+                <h3 class="text-xl font-bold mb-4">הגדרות תצוגה</h3>
+                <label>שם הישיבה:</label>
+                <input type="text" id="set-name" class="w-full p-3 border mb-4 rounded-lg">
+                <label>טקסט רץ בתחתית:</label>
+                <textarea id="set-ticker" class="w-full p-3 border mb-4 rounded-lg h-24"></textarea>
+                <button onclick="saveSettings()" class="bg-amber-600 text-white px-8 py-3 rounded-lg font-bold w-full">שמור הכל</button>
+            </div>
+
+            <div id="p1" class="panel">
+                <h3 class="text-xl font-bold mb-4">הוספת תפילה / שיעור</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="pr-name" placeholder="שם (למשל: מנחה ב')" class="flex-1 p-3 border rounded-lg">
+                    <input type="text" id="pr-time" placeholder="שעה" class="w-32 p-3 border rounded-lg">
+                    <button onclick="add('prayers', {name:$('#pr-name').value, time:$('#pr-time').value})" class="bg-green-600 text-white px-8 rounded-lg font-bold">+</button>
+                </div>
+                <div id="list-prayers" class="mt-8 space-y-2"></div>
+            </div>
+
+            <div id="p2" class="panel">
+                <h3 class="text-xl font-bold mb-4">הודעות רגילות</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="msg-text" placeholder="תוכן ההודעה" class="flex-1 p-3 border rounded-lg">
+                    <button onclick="add('messages', {text:$('#msg-text').value})" class="bg-green-600 text-white px-8 rounded-lg font-bold">+</button>
+                </div>
+                <div id="list-messages" class="mt-8 space-y-2"></div>
+            </div>
+
+            <div id="p3" class="panel">
+                <h3 class="text-xl font-bold mb-4">הקדשות ללימוד</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="ded-text" placeholder="למשל: לזכות רפואת יצחק בן שרה" class="flex-1 p-3 border rounded-lg">
+                    <button onclick="add('dedications', {text:$('#ded-text').value})" class="bg-green-600 text-white px-8 rounded-lg font-bold">+</button>
+                </div>
+                <div id="list-dedications" class="mt-8 space-y-2"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = { /* אותו קונפיג כמו ב-script.js */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        const $ = id => document.querySelector(id);
+        
+        $('#login-btn').onclick = () => {
+            auth.signInWithEmailAndPassword($('#email').value, $('#pass').value)
+                .then(() => { $('#login-form').style.display='none'; $('#admin-content').style.display='block'; })
+                .catch(() => alert("טעות בפרטים"));
+        };
+
+        window.tab = (i) => {
+            document.querySelectorAll('.tab, .panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab')[i].classList.add('active');
+            $(`#p${i}`).classList.add('active');
+        };
+
+        window.saveSettings = () => {
+            db.collection("settings").doc("global").set({
+                shul_name: $('#set-name').value,
+                ticker: $('#set-ticker').value
+            }).then(() => alert("נשמר!"));
+        };
+
+        window.add = (col, data) => {
+            if(!data.name && !data.text) return;
+            db.collection(col).add(data);
+            $(`#${col.slice(0,-1)}-name`) ? $(`#${col.slice(0,-1)}-name`).value = '' : null;
+            $(`#${col.slice(0,-1)}-text`) ? $(`#${col.slice(0,-1)}-text`).value = '' : null;
+        };
+
+        const syncAdmin = (col) => {
+            db.collection(col).onSnapshot(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    html += `<div class="flex justify-between p-3 bg-slate-50 rounded mb-2 border">
+                        <span>${d.name || ''} ${d.time || ''} ${d.text || ''}</span>
+                        <button onclick="db.collection('${col}').doc('${doc.id}').delete()" class="text-red-600 font-bold">מחק</button>
+                    </div>`;
+                });
+                $(`#list-${col}`).innerHTML = html;
+            });
+        };
+        ["prayers", "messages", "dedications"].forEach(syncAdmin);
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תצוגה - חזון אליהו</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen flex flex-col bg-slate-50 text-slate-900 overflow-hidden">
+
+    <header class="h-[18vh] bg-white border-b-8 border-amber-500 flex justify-between items-center px-12 shadow-xl z-20">
+        <div class="flex items-center">
+            <img id="shul-logo" src="logo.png" onerror="this.style.display='none'" class="h-28 w-auto ml-6">
+            <div>
+                <h1 id="display-shul-name" class="text-6xl font-bold text-slate-800">ישיבת חזון אליהו</h1>
+                <p class="text-3xl text-slate-500 italic">תל אביב - יפו</p>
+            </div>
+        </div>
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 text-center min-w-[450px]">
+            <div id="heb-date" class="text-5xl font-bold text-amber-800"></div>
+            <div id="parasha" class="text-4xl text-amber-600 font-bold"></div>
+        </div>
+        <div id="digital-clock" class="text-9xl font-bold tabular-nums">00:00</div>
+    </header>
+
+    <main class="h-[74vh] p-12 relative">
+        <div id="slide-container" class="h-full">
+            <div class="slide active" id="s0">
+                <h2 class="text-7xl font-bold mb-12 text-center">זמני היום</h2>
+                <div id="zmanim-list" class="grid grid-cols-1 gap-4 max-w-4xl mx-auto"></div>
+            </div>
+            <div class="slide" id="s1">
+                <h2 class="text-7xl font-bold mb-12 text-center">לוח תפילות ושיעורים</h2>
+                <div id="prayers-list" class="space-y-4 max-w-4xl mx-auto"></div>
+            </div>
+            <div class="slide" id="s2">
+                <h2 class="text-7xl font-bold mb-12 text-center">שיעורי חת"ת ורמב"ם</h2>
+                <div id="study-area" class="max-w-5xl mx-auto space-y-6"></div>
+            </div>
+            <div class="slide" id="s3">
+                <h2 class="text-7xl font-bold mb-12 text-center text-red-600">לוח מודעות</h2>
+                <div id="msgs-area" class="bg-white rounded-[3rem] p-16 shadow-2xl h-full flex flex-col justify-center text-5xl leading-tight text-center border-4 border-red-50"></div>
+            </div>
+            <div class="slide" id="s4">
+                <h2 class="text-7xl font-bold mb-12 text-center">הלימוד היום מוקדש</h2>
+                <div id="deds-area" class="max-w-5xl mx-auto space-y-8"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="h-[8vh] bg-amber-600 flex items-center overflow-hidden">
+        <div id="ticker-text" class="ticker text-white text-5xl font-bold"></div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
